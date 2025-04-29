@@ -1,0 +1,64 @@
+@import '../../_variables'
+.employee-event
+  width: 100px
+  height: 100%
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
+  flex-shrink: 0
+  border-right: 1px $light-second-font-color solid
+  border-bottom: 1px $light-second-font-color solid
+
+.cart
+  position: fixed
+  right: 0
+  top: 0
+  width: 50%
+  height: 100vh
+  background-color: $light-primary-color
+  padding: 50px
+  z-index: 100
+  &.darkCartMode
+    background-color: $primary-color
+
+.cart__title
+  font-size: 1.5rem
+  font-weight: 700
+  margin-bottom: 40px
+.cart__content
+  font-size: 16px
+  display: grid
+  grid-template-columns: 1fr 1fr
+  margin-bottom: 25px
+.backdrop
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100vh
+  background-color: #000000ab
+  z-index: 10
+.early-time
+  color: red
+.late-time
+  color: red
+.active
+  cursor: pointer
+.employee-event.late
+  position: relative
+  color: red
+.employee-event.late:hover::after
+  content: attr(data-tardiness)
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  display: flex
+  align-items: center
+  justify-content: center
+  background-color: rgb(255, 0, 0)
+  color: #fff
+  white-space: nowrap
+  z-index: 10

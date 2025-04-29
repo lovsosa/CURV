@@ -1,0 +1,72 @@
+@import '../../_variables'
+
+.dashboard-list
+  width: calc(100% - 100px)
+  margin: 25px auto 50px
+  background-color: $light-primary-color
+  border-radius: 10px
+  overflow-x: auto // Используем auto вместо scroll для лучшего UX
+  &.darkMode
+    background-color: $primary-color
+    .dashboard__title
+      span
+        color: $text-color
+
+    .dashboard-group__title
+      color: $text-color
+
+  .dashboard-scroll-container
+    display: inline-flex // Используем flex для управления шириной
+    flex-direction: column
+    min-width: 100% // Минимальная ширина равна ширине контейнера
+
+.dashboard__title
+  color: $text-color
+  font-size: 14px
+  display: flex
+  height: 80px
+  span
+    background-color: $jarvis-color
+    width: 100px
+    height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    flex-shrink: 0
+    border-right: 1px $light-second-font-color solid
+    &:first-child
+      width: 200px
+
+.dashboard-group
+  width: 100%
+  box-sizing: border-box
+
+  &__title
+    width: 100%
+    display: flex
+    justify-content: start
+    align-items: center
+    padding-left: 15px
+    color: $light-text-color
+    height: 40px
+    font-weight: bold
+    font-size: 18px
+    border-bottom: 1px $light-second-font-color solid
+    border-top: 1px $light-second-font-color solid
+    border-right: 1px $light-second-font-color solid
+    min-width: max-content // Заставляем заголовок растягиваться на всю ширину содержимого
+.empty
+  width: calc( 100% - 100px )
+  margin: 25px auto
+  background-color: $light-primary-color
+  border-radius: 10px
+  display: flex
+  align-items: center
+  justify-content: center
+  &.emptyDarkMode
+    background-color: $primary-color
+    .empty__title
+      color: $text-color
+
+.empty__title
+  color: $light-text-color

@@ -1,0 +1,62 @@
+@import "../../_variables"
+
+.period-filter
+  width: calc( 100% - 100px )
+  margin: 25px auto 0
+  display: flex
+  align-items: center
+  justify-content: flex-start
+  background-color: $light-bg-color
+  border-radius: 4px
+  &.darkMode
+    background-color: $bg-color
+    .period-filter__select
+      color: $text-color
+      background-color: $primary-color
+      & > input
+        background-color: $primary-color
+      & > button
+        background-color: $bg-color
+        &:hover
+          background-color: darken($bg-color, 10%)
+
+  &__select
+    padding: 10px 20px
+    border: none
+    border-radius: 5px
+    background-color: $light-primary-color
+    color: $light-text-color
+    font-size: 14px
+    outline: none
+
+  &__custom
+    display: flex
+    align-items: center
+    margin-left: 15px
+    &.customDarkMode
+      & > input
+        background-color: $primary-color
+        color: $text-color
+      &:hover
+        background-color: darken($bg-color, 10%)
+    & > input
+      padding: 10px 20px 10px 20px
+      border: none
+      border-radius: 5px
+      background-color: $light-primary-color
+      font-size: 14px
+      margin-right: 10px
+      outline: none
+
+    & > button
+      height: 38px
+      padding: 10px 20px
+      background-color: $jarvis-color
+      color: #FFFFFF
+      border: none
+      border-radius: 5px
+      cursor: pointer
+      font-size: 14px
+      transition: background-color 0.3s
+      &:hover
+        background-color: darken($light-bg-color, 10%)

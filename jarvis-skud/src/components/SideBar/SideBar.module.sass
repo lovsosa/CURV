@@ -1,0 +1,71 @@
+@import '../../_variables.sass'
+
+.wrapper
+  overflow: hidden
+  display: flex
+.sidebar
+  position: fixed
+  width: 240px
+  height: 100vh
+  background-color: $light-primary-color
+  display: flex
+  flex-direction: column
+  &.hidden
+    width: 70px
+    .header
+      transform: translateX(-200%)
+      .links
+        padding-left: 0
+    .link__img
+      left: 200%
+      margin-left: 1.25rem
+    .logo
+      transform: translateX(-200%)
+  &.darkSidebar
+    background-color: $primary-color
+    .link
+      color: $text-color
+
+.bars
+  width: 1.5rem
+  margin-top: 1.875rem
+  margin-left: 1.25rem
+  cursor: pointer
+
+.header
+  width: 100%
+  display: flex
+  flex-direction: column
+  margin-top: 1.5rem
+  margin-bottom: auto
+.links
+  position: relative
+  padding-left: 4.375rem
+  margin-bottom: 1.5625rem
+.link
+  color: $light-text-color
+  font-weight: 600
+  text-decoration: none
+  font-size: 1.125rem
+.link__img
+  position: absolute
+  top: 0
+  left: -100%
+  width: 1.5rem
+  height: 1.5rem
+
+.logo
+  max-width: 9.375rem
+  margin: 0 auto 1.875rem
+.logo__img
+  width: 100%
+  height: auto
+.page-face
+  width: calc(100% - 240px)
+  min-height: 100vh
+  background-color: $light-bg-color
+  margin-left: auto
+  &.more-width
+    width: calc(100% - 70px)
+  &.darkPage
+    background-color: $bg-color

@@ -1,0 +1,60 @@
+// Определяем переменные для цветов
+$bg-color: #2c2c2c
+$text-color: #f1f1f1
+$form-bg: #3c3c3c
+$border-color: #555
+$button-bg: #444
+$button-hover: #555
+
+// Стиль для контейнера страницы логина
+.login-container
+  display: flex
+  align-items: center
+  justify-content: center
+  min-height: 100vh
+  background-color: $bg-color
+
+// Стиль для формы логина
+.login-form
+  background-color: $form-bg
+  padding: 2rem
+  border-radius: 5px
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5)
+  width: 300px
+
+  h2
+    color: $text-color
+    text-align: center
+    margin-bottom: 1rem
+
+  label
+    color: $text-color
+    display: block
+    margin-bottom: 0.5rem
+
+  input
+    width: 100%
+    padding: 0.5rem
+    margin-bottom: 1rem
+    border: 1px solid $border-color
+    border-radius: 3px
+    background-color: darken($form-bg, 5%)
+    color: $text-color
+
+  button
+    width: 100%
+    padding: 0.7rem
+    border: none
+    border-radius: 3px
+    background-color: $button-bg
+    color: $text-color
+    font-size: 1rem
+    cursor: pointer
+    transition: background-color 0.3s
+
+    &:hover
+      background-color: $button-hover
+
+  p
+    color: #ff6b6b
+    text-align: center

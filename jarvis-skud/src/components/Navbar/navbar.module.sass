@@ -1,0 +1,22 @@
+@import '../../_variables'
+.container
+  max-width: calc( 100% - 100px )
+  margin: 0 auto
+  height: 80px
+  background-color: $light-primary-color
+  border-radius: 10px
+  display: flex
+  justify-content: start
+  align-items: center
+  margin-top: 50px
+  &.darkMode
+    background-color: $primary-color
+    .link
+      color: $text-color
+
+.link
+  color: $light-text-color
+  text-decoration: none
+  font-weight: 600
+  font-size: 1rem
+  margin-left: 50px

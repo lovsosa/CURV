@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "userWithBitrix": true,
+        "name": "Jarvis",
+        "ipAddress": "10.113.100.182",
+        "b24WebhookUrl": "https://jarvis.bitrix24.ru/rest/1/n5vwyux1sl0yifzc/",
+        "authViaFaceEventCode": "75",
+        "autoWorkdayClosing": true,
+        "setClosingTime": "20:00",
+        "closingScheduleTime": "01 20 * * *",
+        "workTimeList": {
+            "workTimeListActive": false,
+            "workTimeListType": "lists",
+            "workTimeListId": "",
+            "fields": {
+                "id": "",
+                "name": "",
+                "month": "",
+                "startWorkDay": "",
+                "endWorkDay": "",
+                "workDayDuration": "",
+                "workBreak": ""
+            }
+        }
+    },
+    {
+        "id": 2,
+        "userWithBitrix": true,
+        "name": "ITLine",
+        "ipAddress": "192.168.1.105",
+        "b24WebhookUrl": "https://europarket.bitrix24.ru/rest/20613/xvepr5lgz0vtobur/",
+        "authViaFaceEventCode": "75",
+        "autoWorkdayClosing": true,
+        "setClosingTime": "21:00",
+        "closingScheduleTime": "01 23 * * *",
+        "workTimeList": {
+            "workTimeListActive": true,
+            "workTimeListType": "lists",
+            "workTimeListId": "67",
+            "fields": {
+                "id": "PROPERTY_189",
+                "name": "NAME",
+                "month": "PROPERTY_187",
+                "change": "PROPERTY_191",
+                "startTime": "PROPERTY_183",
+                "endTime": "PROPERTY_185",
+                "startWorkDay": "PROPERTY_193",
+                "endWorkDay": "PROPERTY_195",
+                "workDayDuration": "PROPERTY_197",
+                "workBreak": "PROPERTY_199", 
+                "elementComplete": "PROPERTY_203"
+            }
+        }
+    }
+]

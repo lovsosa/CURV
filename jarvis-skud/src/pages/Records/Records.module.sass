@@ -1,0 +1,59 @@
+@import '../../_variables'
+.recordsContainer
+  width: calc( 100% - 100px )
+  margin: 25px auto
+  padding: 20px
+  background-color: $light-primary-color
+  color: #333
+  font-family: Arial, sans-serif
+  border-radius: 10px
+  &.darkMode
+    background-color: #2c2c2c
+    color: #ddd
+
+.title
+  font-size: 28px
+  margin-bottom: 20px
+  text-align: center
+
+.scheduleBlock
+  margin-bottom: 30px
+  padding: 15px
+  border: 1px solid #ccc
+  border-radius: 6px
+  background-color: $light-primary-color
+
+  // Если контейнер в темном режиме
+  .darkMode &
+    background-color: $primary-color
+    border-color: #555
+
+.reportTable
+  width: 100%
+  border-collapse: collapse
+  margin-top: 15px
+
+  th, td
+    border: 1px solid #ccc
+    padding: 10px
+    text-align: center
+
+  th
+    background-color: #e0e0e0
+    font-weight: bold
+
+  tr:nth-child(even)
+    background-color: #f4f4f4
+
+  tr:hover
+    background-color: #e8e8e8
+
+// Темные стили для таблицы
+.darkMode
+  .reportTable
+    th
+      background-color: #555
+    tr:nth-child(even)
+      background-color: #444
+    tr:hover
+      background-color: #555
