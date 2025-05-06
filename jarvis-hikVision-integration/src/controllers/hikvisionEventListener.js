@@ -1,11 +1,19 @@
+// src/controllers/hikvisionEventListener.js
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-const { exelWorkday } = require('../services/workdayExcel');
+// Импорт JSON-сервисов вместо Excel-методов
+const { jsonWorkday, closeWorkdaysInJson } = require('../services/workdayJson');
 const { startB24Workday, endB24Workday, getB24WorkdayStatus } = require('../services/workday');
 
-const companies = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'companies.json'), 'utf8'));
+// Читаем список компаний
+const companies = JSON.parse(
+    fs.readFileSync(
+        path.join(__dirname, '..', '..', 'companies.json'),
+        'utf8'
+    )
+);
 
 const hikVisionEventsHandler = async (req, res) => {
     const eventData = req.body;
@@ -19,65 +27,61 @@ const hikVisionEventsHandler = async (req, res) => {
             const ipAddress = event.ipAddress;
             const eventDateTime = event.dateTime;
 
-            const company = companies.find(company => company.ipAddress === ipAddress);
-
+            const company = companies.find(c => c.ipAddress === ipAddress);
             if (!company) {
                 console.log(`No company found for IP address: ${ipAddress}`);
-                return res.status(200).send("Company not found");
+                return res.status(200).send('Company not found');
             }
-            // Проверяем, есть ли у компании Битрикс24
+
+            // Обрабатываем только события открытия/закрытия рабочего дня
             if (subEventType === parseInt(company.authViaFaceEventCode, 10)) {
-                console.log(new Date(), `Received event from IP: ${ipAddress}, Company: ${company.name}, Employee: ${employeeName}, EmployeeId: ${employeeId}, EventDateTime: ${event.dateTime}`);
+                console.log(
+                    new Date(),
+                    `Event from IP: ${ipAddress}, Company: ${company.name}, Employee: ${employeeName} (${employeeId}), DateTime: ${eventDateTime}`
+                );
+
                 const userStatus = await getB24WorkdayStatus(company.b24WebhookUrl, employeeId);
                 if (userStatus.success) {
                     switch (userStatus.status) {
                         case 'PAUSED':
-                            if (company.userWithBitrix) {
-                                console.log(`Resuming workday for: ${employeeName}`);
-                                await startB24Workday(company.b24WebhookUrl, employeeId, eventDateTime);
-                                await exelWorkday(employeeId, employeeName, eventDateTime, company);
-                            }
-                            else {
-                                await exelWorkday(employeeId, employeeName, eventDateTime, company);
-                            }
-                            break;
                         case 'CLOSED':
                             if (company.userWithBitrix) {
-                                console.log(`Starting new workday for: ${employeeName}`);
+                                console.log(`Starting/resuming workday for: ${employeeName}`);
                                 await startB24Workday(company.b24WebhookUrl, employeeId, eventDateTime);
-                                await exelWorkday(employeeId, employeeName, eventDateTime, company);
                             }
-                            else {
-                                await exelWorkday(employeeId, employeeName, eventDateTime, company);
-                            }
+                            await jsonWorkday(employeeId, employeeName, eventDateTime, company);
                             break;
+
                         case 'OPENED':
                             if (company.userWithBitrix) {
                                 console.log(`Ending workday for: ${employeeName}`);
                                 await endB24Workday(company.b24WebhookUrl, employeeId, eventDateTime);
-                                await exelWorkday(employeeId, employeeName, eventDateTime, company);
                             }
-                            else {
-                                await exelWorkday(employeeId, employeeName, eventDateTime, company);
-                            }
+                            await jsonWorkday(employeeId, employeeName, eventDateTime, company);
+                            // Автозакрытие незакрытых дней по расписанию
+                            await closeWorkdaysInJson(company);
                             break;
+
                         default:
-                            console.log(`Unknown workday status for: ${employeeName}, status: ${userStatus.status}`);
-                            break;
+                            console.log(
+                                `Unknown status ${userStatus.status} for ${employeeName}`
+                            );
                     }
                 } else {
-                    console.error(new Date(), `Failed to get user status: ${userStatus.error}`);
+                    console.error(
+                        new Date(),
+                        `Failed to fetch workday status: ${userStatus.error}`
+                    );
                 }
             }
         } else {
-            return res.status(200).send("Skip the event");
+            return res.status(200).send('Skip the event');
         }
 
-        // console.log(new Date(), 'Ивент успешно обработан');
-        return res.status(200).send("Event processed");
+        return res.status(200).send('Event processed');
     } catch (error) {
         console.error('Error parsing event log:', error);
-        return res.status(200).send("Failed to process event data");
+        return res.status(200).send('Failed to process event data');
     }
 };
 
