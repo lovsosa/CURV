@@ -1,7 +1,6 @@
-const XLSX = require('xlsx');
 const path = require('path');
 const fs = require('fs');
-const dir = '/opt/jarvis-surv/build/';
+const dir = path.join(__dirname, '..', '..', 'data', 'build');
 
 // Убедимся, что общая директория существует
 if (!fs.existsSync(dir)) {
@@ -10,51 +9,52 @@ if (!fs.existsSync(dir)) {
 
 const updateEventsHandler = async (req, res) => {
   try {
-    // Ожидается, что данные приходят в формате JSON с ключами: companyId, schedules, shifts
     const { companyId, schedules, shifts } = req.body;
     if (!companyId) {
       return res.status(400).json({ success: false, message: 'ID компании не передан' });
     }
-    if (!schedules || !Array.isArray(schedules)) {
-      return res.status(400).json({ success: false, message: 'Неверный формат расписаний' });
-    }
-    // shifts может быть undefined, поэтому задаем пустой массив, если не переданы
-    const shiftsData = Array.isArray(shifts) ? shifts : [];
 
-    // Загружаем список компаний. Предполагаем, что companies.json лежит в корне проекта
-    const companiesPath = path.join(__dirname, '..', '..', 'companies.json');
-    const companies = JSON.parse(fs.readFileSync(companiesPath, 'utf8'));
-    const company = companies.find(c => String(c.id) === String(companyId));
+    // Загружаем список компаний
+    const companiesData = JSON.parse(fs.readFileSync(
+      path.join(__dirname, '../services/companies.json'), 'utf-8'
+    ));
+    const company = companiesData.find(c => c.id === companyId);
     if (!company) {
-      return res.status(400).json({ success: false, message: 'Компания с данным ID не найдена' });
+      return res.status(404).json({ success: false, message: 'Компания не найдена' });
     }
 
-    // Определяем директорию для компании внутри /var/www/jarvis-surv
     const companyDir = path.join(dir, company.name);
     if (!fs.existsSync(companyDir)) {
       fs.mkdirSync(companyDir, { recursive: true });
     }
 
-    // Формируем пути для файлов
-    const scheduleFilePath = path.join(companyDir, `${company.name}Schedule.xlsx`);
-    const shiftFilePath = path.join(companyDir, `${company.name}Shift.xlsx`);
+    // Формируем данные для JSON
+    const schedulesData = Array.isArray(schedules) ? schedules.map(item => ({
+      id: item.id,
+      userId: item.userId,
+      scheduleDate: item.scheduleDate,
+      startTime: item.startTime,
+      endTime: item.endTime,
+    })) : [];
 
-    // Создаем и сохраняем файл расписаний
-    const workbookSchedule = XLSX.utils.book_new();
-    const schedulesSheet = XLSX.utils.json_to_sheet(schedules);
-    XLSX.utils.book_append_sheet(workbookSchedule, schedulesSheet, 'Schedules');
-    XLSX.writeFile(workbookSchedule, scheduleFilePath);
+    const shiftsData = Array.isArray(shifts) ? shifts.map(item => ({
+      id: item.id,
+      name: item.name,
+      start: item.start,
+      end: item.end,
+    })) : [];
 
-    // Создаем и сохраняем файл смен
-    const workbookShift = XLSX.utils.book_new();
-    const shiftsSheet = XLSX.utils.json_to_sheet(shiftsData);
-    XLSX.utils.book_append_sheet(workbookShift, shiftsSheet, 'Shifts');
-    XLSX.writeFile(workbookShift, shiftFilePath);
+    // Сохраняем JSON-файлы
+    const scheduleFilePath = path.join(companyDir, `${company.name}_schedules.json`);
+    fs.writeFileSync(scheduleFilePath, JSON.stringify(schedulesData, null, 2), 'utf-8');
 
-    res.status(200).json({ success: true, message: 'Excel файлы успешно созданы/обновлены' });
+    const shiftFilePath = path.join(companyDir, `${company.name}_shifts.json`);
+    fs.writeFileSync(shiftFilePath, JSON.stringify(shiftsData, null, 2), 'utf-8');
+
+    res.status(200).json({ success: true, message: 'JSON файлы успешно созданы/обновлены' });
   } catch (error) {
-    console.error('Ошибка обновления Excel:', error);
-    res.status(500).json({ success: false, message: 'Ошибка обновления Excel', error: error.message });
+    console.error('Ошибка обновления JSON:', error);
+    res.status(500).json({ success: false, message: 'Ошибка обновления JSON', error: error.message });
   }
 };
 

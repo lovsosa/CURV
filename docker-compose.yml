@@ -24,6 +24,7 @@ services:
       - "3000:3000"
     volumes:
       - ./jarvis-hikVision-integration:/home/node/app:cached
+      - ./jarvis-hikVision-integration/data:/home/node/app/data
       - /home/node/app/node_modules
     restart: always
     environment:
