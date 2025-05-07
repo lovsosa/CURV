@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const hikVisionEventRouter = require('./src/routes/hikvisionEventListener');
 const { closeWorkdaysBySchedule } = require('./src/services/workday');
-const { closeWorkdaysInExcel } = require('./src/services/workdayExcel');
+const { closeWorkdaysInExcel } = require('./src/services/workdayJson');
 
 const companies = JSON.parse(fs.readFileSync(path.join(__dirname, 'companies.json'), 'utf8'));
 
