@@ -1,60 +1,38 @@
-import React, { useState, useEffect } from "react";
-import * as XLSX from "xlsx";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.sass";
 
 function Login() {
-  const [companies, setCompanies] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // При монтировании страницы сбрасываем авторизацию и удаляем данные компании
-  useEffect(() => {
-    localStorage.setItem("authenticated", "false");
-    localStorage.removeItem("companyId");
-    localStorage.removeItem("companyName");
-  }, []);
-
-  // Загружаем данные из Excel при монтировании компонента
-  useEffect(() => {
-    fetch("/companies.xlsx")
-      .then((response) => response.arrayBuffer())
-      .then((data) => {
-        const workbook = XLSX.read(data, { type: "array" });
-        const worksheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[worksheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        setCompanies(jsonData);
-      })
-      .catch((error) => {
-        console.error("Ошибка при загрузке Excel файла", error);
-      });
-  }, []);
-
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // Предполагаем, что в Excel есть столбцы "login" и "password"
-    const account = companies.find((company) => {
-      return company.login === username && company.password === password;
-    });
-    if (account) {
+    setError("");
+    try {
+      const response = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Ошибка при логине");
+      }
+
+      const { token } = await response.json();
+      // Сохраняем токен для последующих запросов
+      localStorage.setItem("jwtToken", token);
       localStorage.setItem("authenticated", "true");
-      localStorage.setItem("companyId", account.id);
-      localStorage.setItem("companyName", account.name);
+
       navigate("/");
-    } else {
-      setError("Неверное имя пользователя или пароль");
+    } catch (err) {
+      console.error("Login error", err);
+      setError(err.message);
     }
-  }
-
-  function handleUsernameChange(e) {
-    setUsername(e.target.value);
-  }
-
-  function handlePasswordChange(e) {
-    setPassword(e.target.value);
   }
 
   return (
@@ -66,7 +44,7 @@ function Login() {
           <input
             type="text"
             value={username}
-            onChange={handleUsernameChange}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
@@ -75,11 +53,11 @@ function Login() {
           <input
             type="password"
             value={password}
-            onChange={handlePasswordChange}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p className="error-text">{error}</p>}
         <button type="submit">Войти</button>
       </form>
     </div>
