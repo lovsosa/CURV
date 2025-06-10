@@ -33,7 +33,7 @@ const hikVisionEventsHandler = async (req, res) => {
                 console.log(`No company found for IP address: ${ipAddress}`);
                 return res.status(200).send('Company not found');
             }
-            const hrbot = new TelegramApi(company.telegramBotToken, { polling: true })
+            const hrbot = new TelegramApi(company.telegramBotToken)
             // Обрабатываем только события открытия/закрытия рабочего дня
             if (subEventType === parseInt(company.authViaFaceEventCode, 10)) {
                 console.log(
