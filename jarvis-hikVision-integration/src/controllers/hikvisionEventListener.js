@@ -2,6 +2,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
+const TelegramApi = require("node-telegram-bot-api")
 
 // Импорт JSON-сервисов вместо Excel-методов
 const { jsonWorkday, closeWorkdaysInJson } = require('../services/workdayJson');
@@ -32,7 +33,6 @@ const hikVisionEventsHandler = async (req, res) => {
                 console.log(`No company found for IP address: ${ipAddress}`);
                 return res.status(200).send('Company not found');
             }
-            const TelegramApi = require("node-telegram-bot-api")
             const hrbot = new TelegramApi(company.telegramBotToken, { polling: true })
             // Обрабатываем только события открытия/закрытия рабочего дня
             if (subEventType === parseInt(company.authViaFaceEventCode, 10)) {
