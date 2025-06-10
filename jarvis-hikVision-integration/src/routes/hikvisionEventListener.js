@@ -8,7 +8,7 @@ const { updateEventsHandler } = require('../controllers/updateEventListener');
 const { updateEventsOnlyHandler } = require('../controllers/updateEventsOnlyHandler');
 
 router.post('/handle-event', upload.any(), hikVisionEventsHandler);
-router.post('/data-update', upload.any(), updateEventsHandler);
-router.post('/events-only-update', upload.any(), updateEventsOnlyHandler);
+// router.post('/data-update', upload.any(), updateEventsHandler);
+// router.post('/events-only-update', upload.any(), updateEventsOnlyHandler);
 
 module.exports = router;

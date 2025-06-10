@@ -32,7 +32,8 @@ const hikVisionEventsHandler = async (req, res) => {
                 console.log(`No company found for IP address: ${ipAddress}`);
                 return res.status(200).send('Company not found');
             }
-
+            const TelegramApi = require("node-telegram-bot-api")
+            const hrbot = new TelegramApi(company.telegramBotToken, { polling: true })
             // Обрабатываем только события открытия/закрытия рабочего дня
             if (subEventType === parseInt(company.authViaFaceEventCode, 10)) {
                 console.log(
@@ -47,19 +48,19 @@ const hikVisionEventsHandler = async (req, res) => {
                         case 'CLOSED':
                             if (company.userWithBitrix) {
                                 console.log(`Starting/resuming workday for: ${employeeName}`);
-                                await startB24Workday(company.b24WebhookUrl, employeeId, eventDateTime);
+                                await startB24Workday(company.b24WebhookUrl, employeeId, eventDateTime, company, hrbot);
                             }
-                            await jsonWorkday(employeeId, employeeName, eventDateTime, company);
+                            // await jsonWorkday(employeeId, employeeName, eventDateTime, company);
                             break;
 
                         case 'OPENED':
                             if (company.userWithBitrix) {
                                 console.log(`Ending workday for: ${employeeName}`);
-                                await endB24Workday(company.b24WebhookUrl, employeeId, eventDateTime);
+                                await endB24Workday(company.b24WebhookUrl, employeeId, eventDateTime, company, hrbot);
                             }
-                            await jsonWorkday(employeeId, employeeName, eventDateTime, company);
+                            // await jsonWorkday(employeeId, employeeName, eventDateTime, company);
                             // Автозакрытие незакрытых дней по расписанию
-                            await closeWorkdaysInJson(company);
+                            // await closeWorkdaysInJson(company);
                             break;
 
                         default:

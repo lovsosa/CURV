@@ -1,13 +1,16 @@
+require('dotenv').config();
 const axios = require('axios');
 const moment = require('moment-timezone');
 const fs = require('fs');
 const path = require('path');
 const { log } = require('console');
 
-const startB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime) => {
+
+const startB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime, company, hrbot) => {
     try {
         // Получаем данные о времени работы пользователя
-        const workTimeData = await getUserWorkTimeData(bitrixWebhook, bitrixUserId);
+        const workTimeData = await getUserWorkTimeData(bitrixWebhook, bitrixUserId, company.fieldTelegramID);
+        const chatId = workTimeData?.telegramChatId;
         const timeStart = workTimeData?.timeStart;
         console.log("startB24Workday:", eventDateTime);
         // Формируем тело запроса в зависимости от наличия времени начала
@@ -27,12 +30,18 @@ const startB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime) => {
             return { success: false, message: "Нет данных результата" };
         }
         if (resultData.STATUS === "OPENED") {
+            if (company.messageToTelegram && chatId) {
+                await hrbot.sendMessage(chatId, `Доброе утро, ${workTimeData?.name}! Ваш рабочий день успешно начат. Удачной работы!`);
+            }
             return {
                 success: true,
                 message: "Рабочий день начат успешно",
                 data: resultData
             };
         } else {
+            if (company.messageToTelegram && chatId) {
+                await hrbot.sendMessage(chatId, `Доброе утро, ${workTimeData?.name}! Произошла ошибка, пожалуйста запустите рабочий день вручную.`);
+            }
             const errorMsg = response.data.error || resultData.STATUS;
             console.error("Ошибка при начале рабочего дня:", errorMsg);
             return {
@@ -42,6 +51,9 @@ const startB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime) => {
             };
         }
     } catch (error) {
+        if (company.messageToTelegram && chatId) {
+            await hrbot.sendMessage(chatId, `Ошибка сервера при попытке начать ваш рабочий день. Пожалуйста, запустите рабочий день вручную и свяжитесь с Мелисом.`);
+        }
         console.error(
             `Ошибка сервера при попытке начать рабочий день для пользователя ${bitrixUserId}:`,
             error.message
@@ -55,8 +67,9 @@ const startB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime) => {
 };
 
 
-const endB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime) => {
-    console.log(eventDateTime, "endB24Workday");
+const endB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime, company, hrbot) => {
+    const workTimeData = await getUserWorkTimeData(bitrixWebhook, bitrixUserId, company.fieldTelegramID);
+    const chatId = workTimeData?.telegramChatId;
     try {
         const response = await axios.post(`${bitrixWebhook}timeman.close`, {
             user_id: bitrixUserId,
@@ -64,6 +77,9 @@ const endB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime) => {
             REPORT: "Закрыто автоматически камерой HikVision"
         });
         if (response.data.result.STATUS === 'CLOSED') {
+            if (company.messageToTelegram && chatId) {
+                await hrbot.sendMessage(chatId, `Ваш рабочий день успешно завершен. Хорошего вечера!`);
+            }
             // console.log(new Date(), 'Рабочий день завершён успешно:', response.data.result);
             return {
                 success: true,
@@ -71,6 +87,9 @@ const endB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime) => {
                 data: response.data.result
             };
         } else {
+            if (company.messageToTelegram && chatId) {
+                await hrbot.sendMessage(chatId, `Произошла ошибка, пожалуйста завершите рабочий день вручную.`);
+            }
             // console.error('Ошибка при завершении рабочего дня:', response.data.error || response.data.result.STATUS);
             return {
                 success: false,
@@ -79,6 +98,9 @@ const endB24Workday = async (bitrixWebhook, bitrixUserId, eventDateTime) => {
             };
         }
     } catch (error) {
+        if (company.messageToTelegram && chatId) {
+            await hrbot.sendMessage(chatId, `Ошибка сервера при попытке завершить ваш рабочий день. Пожалуйста, завершите рабочий день вручную и свяжитесь с Мелисом.`);
+        }
         console.error(new Date(), `Ошибка сервера при попытке завершить рабочий день для пользователя ${bitrixUserId} в Bitrix24:`, error.message);
         return {
             success: false,
@@ -189,7 +211,7 @@ const closeWorkdaysBySchedule = async (company) => {
     }
 };
 // Вводим данные в список
-const getUserWorkTimeData = async (bitrixWebhook, bitrixUserId) => {
+const getUserWorkTimeData = async (bitrixWebhook, bitrixUserId, TG_FIELD_NAME) => {
     try {
         const response = await axios.get(`${bitrixWebhook}timeman.status`, {
             params: { user_id: bitrixUserId }
@@ -203,6 +225,7 @@ const getUserWorkTimeData = async (bitrixWebhook, bitrixUserId) => {
             timeFinish: response.data.result.TIME_FINISH,
             duration: response.data.result.DURATION,
             timeLeaks: response.data.result.TIME_LEAKS,
+            telegramChatId: getUserProfile.data.result[0][TG_FIELD_NAME],
         }
     } catch (error) {
         console.error(`Ошибка getUserWorkTimeData`, error.message);

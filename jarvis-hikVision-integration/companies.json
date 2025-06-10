@@ -9,6 +9,9 @@
         "autoWorkdayClosing": true,
         "setClosingTime": "20:00",
         "closingScheduleTime": "01 20 * * *",
+        "messageToTelegram": true,
+        "telegramBotToken": "8198838298:AAF8RBkbKqwhIxogBCs9haiLEqkcZtaqb2Q",
+        "fieldTelegramID": "UF_USR_1749547468793",
         "workTimeList": {
             "workTimeListActive": false,
             "workTimeListType": "lists",
@@ -34,8 +37,9 @@
         "autoWorkdayClosing": true,
         "setClosingTime": "21:00",
         "closingScheduleTime": "01 23 * * *",
+        "messageToTelegram": false,
         "workTimeList": {
-            "workTimeListActive": true,
+            "workTimeListActive": false,
             "workTimeListType": "lists",
             "workTimeListId": "67",
             "fields": {
