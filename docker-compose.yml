@@ -38,7 +38,7 @@ services:
       context: ./jarvis-skud
     container_name: jarvis-hikVision-frontend
     ports:
-      - "8080:80" # Фронт будет доступен по 8080
+      - "8080:80"
     restart: always
     environment:
       - TZ=Asia/Almaty
@@ -55,3 +55,22 @@ services:
       - app
     networks:
       - dev
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: jarvis_survmenu_admin
+      POSTGRES_PASSWORD: 8mba1JYebC
+      POSTGRES_DB: survdatabase
+      TZ: Asia/Almaty
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - dev
+
+volumes:
+  pgdata:
